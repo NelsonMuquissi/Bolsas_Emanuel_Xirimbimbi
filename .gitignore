@@ -1,0 +1,58 @@
+# Arquivos do Python
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# Arquivos do Django
+*.log
+*.pot
+*.pyc
+*.sqlite3
+migrations/*.pyc
+migrations/__pycache__/
+
+# Arquivos sensíveis
+payments/config.py
+.env
+*.env
+*.secret
+*.key
+
+# Diretórios de mídia temporária
+media/temp_certificados/
+media/certificados/
+
+# Arquivos do ambiente de desenvolvimento
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.DS_Store
+
+# Arquivos de build e pacotes
+dist/
+build/
+*.egg-info/
+*.egg
+
+# Arquivos de cache
+*.cache
+.cache/
+.pytest_cache/
+.coverage
+coverage.xml
+*.cover
+
+# Outros
+*.bak
+*.backup
+*.tmp
+*.temp
