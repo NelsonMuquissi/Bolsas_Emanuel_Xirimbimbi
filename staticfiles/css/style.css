@@ -1,0 +1,236 @@
+:root {
+  --bg-deep: #0b1026;
+  --bg-elev: #12183a;
+  --text: #e9ecff;
+  --muted: #adb5bd;
+  --brand: #f4c430;
+  --brand-2: #7aa6ff;
+  --success: #20c997;
+}
+
+html,
+body {
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+}
+
+body {
+  background: radial-gradient(1200px 600px at 10% 0%, #18204d 0%, var(--bg-deep) 40%, #0a0f24 100%);
+  color: var(--text);
+}
+
+/* Navbar */
+.navbar {
+  background: rgba(10, 15, 36, 0.85);
+  backdrop-filter: saturate(140%) blur(10px);
+}
+
+.navbar .btn-cta {
+  background: linear-gradient(135deg, var(--brand), #ffd86b);
+  color: #121212;
+  font-weight: 600;
+  border: none;
+}
+
+/* Hero */
+.hero {
+  position: relative;
+  isolation: isolate;
+}
+
+.hero::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: radial-gradient(600px 300px at 85% 20%, rgba(244, 196, 48, .25), transparent 60%),
+    radial-gradient(400px 200px at 20% 80%, rgba(122, 166, 255, .18), transparent 60%);
+  opacity: .9;
+}
+
+.badge-soft {
+  background: rgba(244, 196, 48, .12);
+  color: #ffe9a3;
+  border: 1px solid rgba(244, 196, 48, .3);
+}
+
+/* Cards */
+.card-dark {
+  background: linear-gradient(180deg, rgba(255, 255, 255, .05), rgba(255, 255, 255, .02));
+  border: 1px solid rgba(255, 255, 255, .08);
+  color: var(--text);
+  min-height: 100%;
+}
+
+.card-dark .icon-box {
+  width: 48px;
+  height: 48px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(122, 166, 255, .15);
+  border: 1px solid rgba(122, 166, 255, .35);
+}
+
+/* Section headings */
+.section-title {
+  font-weight: 700;
+  letter-spacing: .2px;
+}
+
+.section-sub {
+  color: var(--muted);
+}
+
+/* Buttons */
+.btn-brand {
+  background: linear-gradient(135deg, var(--brand), #ffd86b);
+  color: #111;
+  font-weight: 700;
+  border: none;
+  box-shadow: 0 10px 30px rgba(244, 196, 48, .2);
+}
+
+.btn-outline-brand {
+  border: 1px solid var(--brand);
+  color: #ffe9a3;
+}
+
+.btn-outline-brand:hover {
+  background: rgba(244, 196, 48, .12);
+}
+
+/* CTA ribbon */
+.floating-cta {
+  position: fixed;
+  right: 16px;
+  bottom: 16px;
+  z-index: 1050;
+}
+
+/* Footer */
+footer {
+  border-top: 1px solid rgba(255, 255, 255, .08);
+  color: var(--muted);
+}
+
+a {
+  color: #cfe0ff;
+}
+
+a:hover {
+  color: #ffffff;
+}
+
+/* Forms on dark */
+.form-control,
+.form-select {
+  background: rgba(255, 255, 255, .04);
+  border: 1px solid rgba(255, 255, 255, .15);
+  color: #fff;
+}
+
+.form-control::placeholder {
+  color: #cfd3e6;
+}
+
+.form-label {
+  color: #dfe3ff;
+  font-weight: 600;
+}
+
+.form-hint {
+  color: var(--muted);
+  font-size: .9rem;
+}
+
+.form-select {
+  color: var(--text);
+  background-color: rgba(255, 255, 255, .04);
+}
+
+.form-select option {
+  background-color: var(--bg-deep);
+  color: var(--text);
+}
+
+/* University cards */
+.university-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.university-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 10px 25px rgba(0, 0, 0, 0.2);
+}
+
+/* Hidden elements */
+.hidden {
+  display: none;
+}
+
+/* Testimonial cards */
+.testimonial-card {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 1.5rem;
+}
+
+.testimonial-card img {
+  width: 80px;
+  height: 80px;
+  object-fit: cover;
+  border-radius: 50%;
+  border: 2px solid var(--brand);
+}
+
+.testimonial-card .quote-icon {
+  color: var(--brand);
+  font-size: 1.5rem;
+  opacity: 0.3;
+}
+
+/* International cards */
+.international-cards .card-dark {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100%;
+  padding: 1.5rem;
+}
+
+.international-cards .card-dark ul {
+  flex-grow: 1;
+  margin-bottom: 1rem;
+}
+
+/* Responsive tweaks */
+@media (max-width: 575.98px) {
+  .display-4 {
+    font-size: 2.25rem;
+  }
+
+  .lead {
+    font-size: 1rem;
+  }
+
+  .form-select,
+  .form-control {
+    font-size: 0.9rem;
+  }
+
+  .university-card,
+  .testimonial-card {
+    min-height: auto;
+  }
+}
+
+.alert.hidden {
+  display: none;
+}
+
+.alert {
+  margin-bottom: 1rem;
+}
