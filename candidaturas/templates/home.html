@@ -30,9 +30,9 @@
       </button>
       <div class="collapse navbar-collapse" id="nav">
         <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
+          <li class="nav-item"><a class="nav-link text-white-50" href="#top">Home</a></li>
           <li class="nav-item"><a class="nav-link text-white-50" href="#sobre">Sobre</a></li>
-          <li class="nav-item"><a class="nav-link text-white-50" href="#nacionais">Bolsas Nacionais</a></li>
-          <li class="nav-item"><a class="nav-link text-white-50" href="#internacionais">Bolsas Internacionais</a></li>
+          <li class="nav-item"><a class="nav-link text-white-50" href="#oportunidades">Bolsas
           <li class="nav-item"><a class="nav-link text-white-50" href="#inscricao">Inscrição</a></li>
         </ul>
         <div class="ms-lg-3">
@@ -52,31 +52,11 @@
           <p class="lead text-white-50 mt-3">"Educação é o combustível do sucesso" — Uma oportunidade única para jovens angolanos alcançarem seus sonhos académicos.</p>
           <div class="d-flex flex-wrap gap-3 mt-4">
             <button class="btn btn-brand btn-lg rounded-pill px-4" onclick="scrollToInscricao()"><i class="bi bi-rocket-takeoff me-2"></i>Candidatar-me Agora</button>
-            <a href="#nacionais" class="btn btn-outline-brand btn-lg rounded-pill px-4"><i class="bi bi-info-circle me-2"></i>Ver Bolsas</a>
+            <a href="#oportunidades" class="btn btn-outline-brand btn-lg rounded-pill px-4"><i class="bi bi-info-circle me-2"></i>Ver Bolsas</a>
           </div>
           <div class="d-flex gap-4 mt-4 text-white-50">
             <div><span class="h3 mb-0 text-white">100%</span><div>pagas e comparticipadas até 85%</div></div>
             <div><span class="h3 mb-0 text-white">∞</span><div>Oportunidades</div></div>
-          </div>
-          <div class="mt-4">
-            <div class="card card-dark p-3 rounded-4">
-              <h6 class="text-brand mb-2">Estude no Exterior</h6>
-              <p class="text-white-50 small mb-2">Oportunidades em renomadas universidades na Argentina, Uruguai, Espanha, Brasil e Portugal.</p>
-              <ul class="text-white-50 small mb-0">
-                {% for pais_nome, insts in international_data.items %}
-                <li><strong>{{ pais_nome }}:</strong> 
-                  {% for inst in insts|slice:":3" %}
-                    {{ inst.nome }}{% if not forloop.last %}, {% endif %}
-                  {% empty %}
-                    Nenhuma instituição disponível
-                  {% endfor %}
-                </li>
-                {% empty %}
-                  <li>Nenhum país internacional configurado</li>
-                {% endfor %}
-              </ul>
-              <a href="#internacionais" class="btn btn-sm btn-outline-brand rounded-pill mt-3">Explorar Bolsas Internacionais</a>
-            </div>
           </div>
         </div>
         <div class="col-lg-5">
@@ -152,13 +132,55 @@
     </div>
   </section>
 
+  <!-- OPORTUNIDADES -->
+  <section class="py-5" id="oportunidades">
+    <div class="container">
+      <div class="row mb-4">
+        <div class="col-lg-8">
+          <h2 class="section-title">Oportunidades</h2>
+          <p class="section-sub">Explore bolsas nacionais e internacionais para transformar seu futuro.</p>
+        </div>
+      </div>
+      <div class="row">
+        <div class="col-12">
+          <div id="bolsasCarousel" class="carousel slide" data-bs-ride="carousel">
+            <div class="carousel-inner">
+              <div class="carousel-item active">
+                <div class="card card-dark p-4 rounded-4 text-center">
+                  <h5 class="mb-3">Bolsas Nacionais</h5>
+                  <p class="text-white-50 mb-3">Estude nas melhores universidades de Angola com propinas 100% cobertas após aprovação.</p>
+                  <a href="/bolsas/nacionais" class="btn btn-brand rounded-pill px-4">Explorar Bolsas</a>
+                </div>
+              </div>
+              <div class="carousel-item">
+                <div class="card card-dark p-4 rounded-4 text-center">
+                  <h5 class="mb-3">Bolsas Internacionais</h5>
+                  <p class="text-white-50 mb-3">Oportunidades em universidades renomadas na Argentina, Uruguai, Espanha, Brasil e Portugal.</p>
+                  <a href="/bolsas/internacionais" class="btn btn-brand rounded-pill px-4">Explorar Bolsas</a>
+                </div>
+              </div>
+            </div>
+            <button class="carousel-control-prev" type="button" data-bs-target="#bolsasCarousel" data-bs-slide="prev">
+              <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Previous</span>
+            </button>
+            <button class="carousel-control-next" type="button" data-bs-target="#bolsasCarousel" data-bs-slide="next">
+              <span class="carousel-control-next-icon" aria-hidden="true"></span>
+              <span class="visually-hidden">Next</span>
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
   <!-- INSCRIÇÃO -->
   <section class="py-5" id="inscricao">
     <div class="container">
       <div class="row mb-4">
         <div class="col-lg-8">
           <h2 class="section-title">Inscrição</h2>
-          <p class="section-sub">Escolha o tipo de bolsa e candidate-se para transformar seu futuro.</p>
+          <p class="section-sub">Candidate-se agora para transformar seu futuro.</p>
         </div>
       </div>
       <div class="row g-4" id="scholarship-options">
@@ -166,27 +188,6 @@
           <div class="card card-dark p-4 rounded-4 h-100">
             <h5 class="mb-3">Bolsas Nacionais</h5>
             <p class="text-white-50 small mb-3">Estude nas melhores universidades de Angola com propinas 100% cobertas após aprovação.</p>
-            <ul class="text-white-50 small mb-3">
-              <li>Taxa de inscrição: {{ national_fee.valor }} {{ national_fee.moeda }}</li>
-              <li>Universidades: 
-                {% for inst in national_institutions|slice:":3" %}
-                  {{ inst.nome }}{% if not forloop.last %}, {% endif %}
-                {% empty %}
-                  Nenhuma universidade nacional disponível
-                {% endfor %}
-              </li>
-              <li>Cursos: 
-                {% for inst in national_institutions %}
-                  {% for curso in inst.cursos_ativos|slice:":3" %}
-                    {{ curso.nome }}{% if not forloop.last %}, {% endif %}
-                  {% empty %}
-                  {% endfor %}
-                  {% if not forloop.last %}; {% endif %}
-                {% empty %}
-                  Nenhum curso disponível
-                {% endfor %}
-              </li>
-            </ul>
             <button class="btn btn-brand rounded-pill px-4" onclick="showForm('national')">Candidatar-me<i class="bi bi-arrow-right ms-2"></i></button>
           </div>
         </div>
@@ -194,34 +195,6 @@
           <div class="card card-dark p-4 rounded-4 h-100">
             <h5 class="mb-3">Bolsas Internacionais</h5>
             <p class="text-white-50 small mb-3">Oportunidades em universidades renomadas na Argentina, Uruguai, Espanha, Brasil e Portugal.</p>
-            <ul class="text-white-50 small mb-3">
-              <li>Taxa de inscrição: {{ standard_fee.valor }} {{ standard_fee.moeda }} (Standard) ou {{ brasil_premium.valor }} {{ brasil_premium.moeda }} (Premium, Brasil)</li>
-              <li>Universidades: 
-                {% for pais_nome, insts in international_data.items %}
-                  {% for inst in insts|slice:":3" %}
-                    {{ inst.nome }} ({{ pais_nome }}){% if not forloop.last %}, {% endif %}
-                  {% empty %}
-                  {% endfor %}
-                  {% if not forloop.last %}; {% endif %}
-                {% empty %}
-                  Nenhuma universidade internacional disponível
-                {% endfor %}
-              </li>
-              <li>Cursos: 
-                {% for pais_nome, insts in international_data.items %}
-                  {% for inst in insts %}
-                    {% for curso in inst.cursos_ativos|slice:":3" %}
-                      {{ curso.nome }} ({{ pais_nome }}){% if not forloop.last %}, {% endif %}
-                    {% empty %}
-                    {% endfor %}
-                    {% if not forloop.last %}; {% endif %}
-                  {% empty %}
-                  {% endfor %}
-                {% empty %}
-                  Nenhum curso disponível
-                {% endfor %}
-              </li>
-            </ul>
             <button class="btn btn-brand rounded-pill px-4" onclick="showForm('international')">Candidatar-me<i class="bi bi-arrow-right ms-2"></i></button>
           </div>
         </div>
@@ -229,37 +202,37 @@
       <div class="row g-4 mt-4">
         <div class="col-12 hidden" id="application-form">
           <div class="card card-dark p-4 rounded-4">
-            <h5 id="form-title" class="mb-3">Candidatura — Bolsa Nacional</h5>
-            <form class="row g-3 needs-validation" novalidate id="applicationForm" enctype="multipart/form-data">
+            <h5 id="form-title" class="mb-3">Candidatura</h5>
+            <form class="g-3 needs-validation" novalidate id="applicationForm" enctype="multipart/form-data">
               {% csrf_token %}
               <input type="hidden" id="bolsa-type" name="bolsa-type" value="">
-              <div class="col-12">
-                <label for="nome" class="form-label">Nome Completo *</label>
+              <div class="mb-3">
+                <label for="nome" class="form-label"><i class="bi bi-person me-2"></i>Nome Completo *</label>
                 <input id="nome" name="nome" class="form-control" required placeholder="Digite seu nome completo" />
                 <div class="invalid-feedback">Informe seu nome.</div>
               </div>
-              <div class="col-md-6">
-                <label for="idade" class="form-label">Idade *</label>
+              <div class="mb-3">
+                <label for="idade" class="form-label"><i class="bi bi-cake me-2"></i>Idade *</label>
                 <input id="idade" name="idade" type="number" class="form-control" placeholder="Sua idade" min="16" max="35" required />
                 <div class="invalid-feedback">Informe sua idade (16-35 anos).</div>
               </div>
-              <div class="col-md-6">
-                <label for="bi" class="form-label">Bilhete de Identidade *</label>
+              <div class="mb-3">
+                <label for="bi" class="form-label"><i class="bi bi-card-text me-2"></i>Bilhete de Identidade *</label>
                 <input id="bi" name="bi" class="form-control" placeholder="123456789LA123" pattern="[0-9]{9}[A-Z]{2}[0-9]{3}" required />
                 <div class="invalid-feedback">Informe um BI válido (ex.: 123456789LA123).</div>
               </div>
-              <div class="col-md-6">
-                <label for="tel" class="form-label">Telefone *</label>
+              <div class="mb-3">
+                <label for="tel" class="form-label"><i class="bi bi-telephone me-2"></i>Telefone *</label>
                 <input id="tel" name="tel" type="tel" class="form-control" placeholder="923440172" pattern="[9][0-9]{8}" required />
                 <div class="invalid-feedback">Informe um telefone válido (ex.: 923440172).</div>
               </div>
-              <div class="col-md-6">
-                <label for="email" class="form-label">E-mail *</label>
+              <div class="mb-3">
+                <label for="email" class="form-label"><i class="bi bi-envelope me-2"></i>E-mail *</label>
                 <input id="email" name="email" type="email" class="form-control" placeholder="exemplo@email.com" required />
                 <div class="invalid-feedback">Informe um e-mail válido.</div>
               </div>
-              <div class="col-12 hidden" id="pais-container">
-                <label for="pais" class="form-label">País *</label>
+              <div class="mb-3 hidden" id="pais-container">
+                <label for="pais" class="form-label"><i class="bi bi-globe me-2"></i>País *</label>
                 <select class="form-select" id="pais" name="pais">
                   <option value="">Selecione o país...</option>
                   {% for pais in international_paises %}
@@ -268,8 +241,8 @@
                 </select>
                 <div class="invalid-feedback">Selecione o país.</div>
               </div>
-              <div class="col-12 hidden" id="tipo-brasil-container">
-                <label for="tipo-brasil" class="form-label">Tipo de Bolsa no Brasil *</label>
+              <div class="mb-3 hidden" id="tipo-brasil-container">
+                <label for="tipo-brasil" class="form-label"><i class="bi bi-star me-2"></i>Tipo de Bolsa no Brasil *</label>
                 <select class="form-select" id="tipo-brasil" name="tipo-brasil">
                   <option value="">Selecione...</option>
                   <option value="standard">Standard</option>
@@ -277,127 +250,50 @@
                 </select>
                 <div class="invalid-feedback">Selecione o tipo de bolsa.</div>
               </div>
-              <div class="col-12" id="universidade-container">
-                <label for="universidade" class="form-label">Universidade *</label>
+              <div class="mb-3" id="universidade-container">
+                <label for="universidade" class="form-label"><i class="bi bi-building me-2"></i>Universidade *</label>
                 <select class="form-select" id="universidade" name="universidade" required>
                   <option value="">Selecione a universidade...</option>
                   {% for inst in all_institutions %}
-                    <option value="{{ inst.id }}" data-pais="{{ inst.pais.nome }}">{{ inst.nome }} ({{ inst.pais.nome }})</option>
+                    <option value="{{ inst.id }}" data-pais="{{ inst.pais.nome }}">{{ inst.pais.nome }} -- {{ inst.nome }}</option>
                   {% endfor %}
                 </select>
                 <div class="invalid-feedback">Selecione uma universidade.</div>
               </div>
-              <div class="col-12" id="curso-container">
-                <label for="curso" class="form-label">Curso *</label>
+              <div class="mb-3" id="curso-container">
+                <label for="curso" class="form-label"><i class="bi bi-book me-2"></i>Curso *</label>
                 <select class="form-select" id="curso" name="curso" required>
                   <option value="">Selecione o curso...</option>
-                  {% for curso in all_courses %}
-                    <option value="{{ curso.id }}" data-uni="{{ curso.instituicao.id }}">{{ curso.nome }} - {{ curso.instituicao.nome }} ({{ curso.instituicao.pais.nome }})</option>
-                  {% endfor %}
                 </select>
                 <div class="invalid-feedback">Selecione um curso.</div>
               </div>
-              <div class="col-12">
-                <label for="certificado" class="form-label">Certificado/Declaração de Notas *</label>
+              <div class="mb-3">
+                <label for="certificado" class="form-label"><i class="bi bi-file-earmark-text me-2"></i>Certificado/Declaração de Notas *</label>
                 <input type="file" class="form-control" id="certificado" name="certificado" accept=".pdf" required>
-                <div class="invalid-feedback">Envie seu certificado ou declaração de notas em formato PDF.</div>
+                <div class="invalid-feedback">Envie seu certificado em formato PDF.</div>
               </div>
-              <div class="col-12 hidden" id="international-note">
+              <div class="mb-3 hidden" id="international-note">
                 <p class="text-white-50 small">OBS: Ainda não cobre o bilhete de passagem, cobre apenas a situação académica.</p>
               </div>
-              <div class="col-12">
+              <div class="mb-3">
                 <div class="form-check">
                   <input class="form-check-input" type="checkbox" id="termos" name="termos" required>
                   <label class="form-check-label small" for="termos">
-                    Concordo com os termos e condições e confirmo que minhas informações estão corretas. O pagamento desta taxa não significa a concessão total da bolsa, significa o pagamento da taxa de inscrição para o fundo de bolsa.
+                    Concordo com os termos e condições e confirmo que minhas informações estão corretas.
                   </label>
                   <div class="invalid-feedback">Você deve concordar para continuar.</div>
                 </div>
               </div>
-              <div class="col-12 d-flex justify-content-between mt-2">
+              <div class="d-flex justify-content-between mt-2">
                 <button type="button" class="btn btn-outline-brand rounded-pill px-4" onclick="hideForm()">Cancelar</button>
-                <button type="submit" class="btn btn-brand rounded-pill px-4">Próximo<i class="bi bi-arrow-right ms-2"></i></button>
+                <button type="submit" class="btn btn-brand rounded-pill px-4" id="submit-btn">
+                  Próximo<i class="bi bi-arrow-right ms-2"></i>
+                  <span class="spinner-border spinner-border-sm ms-2 hidden" id="submit-spinner"></span>
+                </button>
               </div>
             </form>
           </div>
         </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- BOLSAS NACIONAIS -->
-  <section class="py-5" id="nacionais">
-    <div class="container">
-      <div class="row mb-4">
-        <div class="col-lg-8">
-          <h2 class="section-title">Bolsas Nacionais</h2>
-          <p class="section-sub">Estude nas melhores universidades de Angola.</p>
-        </div>
-      </div>
-      <div class="row g-4">
-        {% for inst in national_institutions %}
-        <div class="col-md-6 col-lg-4">
-          <div class="card card-dark p-4 rounded-4 h-100 university-card">
-            <h5 class="mb-3">{{ inst.nome }}</h5>
-            <h6 class="text-brand mb-2">Cursos Disponíveis</h6>
-            <ul class="text-white-50 small mb-0">
-              {% for curso in inst.cursos_ativos|slice:":5" %}
-              <li>{{ curso.nome }}</li>
-              {% empty %}
-              <li>Nenhum curso disponível</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-          <p class="text-center text-white-50">Nenhuma instituição nacional disponível no momento.</p>
-        </div>
-        {% endfor %}
-      </div>
-    </div>
-  </section>
-
-  <!-- BOLSAS INTERNACIONAIS -->
-  <section class="py-5 international-cards" id="internacionais">
-    <div class="container">
-      <div class="row mb-4">
-        <div class="col-lg-8">
-          <h2 class="section-title">Bolsas Internacionais</h2>
-          <p class="section-sub">Oportunidades de estudo em universidades renomadas na Argentina, Uruguai, Espanha, Brasil e Portugal.</p>
-        </div>
-      </div>
-      <div class="row g-4">
-        {% for pais_nome, insts in international_data.items %}
-        <div class="col-md-6 col-lg-3">
-          <div class="card card-dark p-4 rounded-4 university-card">
-            <h5 class="mb-3">{{ pais_nome }}</h5>
-            <h6 class="text-brand mb-2">Universidades</h6>
-            <ul class="text-white-50 small mb-2">
-              {% for inst in insts|slice:":3" %}
-              <li>{{ inst.nome }}</li>
-              {% empty %}
-              <li>Nenhuma universidade</li>
-              {% endfor %}
-            </ul>
-            <h6 class="text-brand mb-2">Cursos (Seleção)</h6>
-            <ul class="text-white-50 small mb-0">
-              {% for inst in insts %}
-                {% for curso in inst.cursos_ativos|slice:":3" %}
-                <li>{{ curso.nome }}</li>
-                {% empty %}
-                {% endfor %}
-              {% empty %}
-              <li>Nenhum curso</li>
-              {% endfor %}
-            </ul>
-          </div>
-        </div>
-        {% empty %}
-        <div class="col-12">
-          <p class="text-center text-white-50">Nenhum país internacional configurado.</p>
-        </div>
-        {% endfor %}
       </div>
     </div>
   </section>
@@ -457,3 +353,4 @@
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
 </body>
 </html>
+

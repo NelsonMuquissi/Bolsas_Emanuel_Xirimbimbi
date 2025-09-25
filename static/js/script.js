@@ -34,27 +34,20 @@ function showForm(type) {
         tipoBrasilContainer.classList.add('hidden');
         internationalNote.classList.add('hidden');
         Array.from(universidadeSelect.options).forEach(option => {
-            option.style.display = option.dataset.pais === 'Angola' || option.value === '' ? '' : 'none';
+            option.style.display = (option.dataset.pais === 'Angola' || option.value === '') ? '' : 'none';
         });
     } else {
         formTitle.textContent = 'Candidatura — Bolsa Internacional';
-        paisContainer.classList.remove('hidden');
+        paisContainer.classList.add('hidden'); // Removido o seletor de país para internacionais
         internationalNote.classList.remove('hidden');
+        tipoBrasilContainer.classList.remove('hidden');
         Array.from(universidadeSelect.options).forEach(option => {
-            option.style.display = '';
+            option.style.display = (option.dataset.pais !== 'Angola' || option.value === '') ? '' : 'none';
         });
     }
 
-    universidadeSelect.addEventListener('change', function() {
-        const selectedUniId = this.value;
-        Array.from(cursoSelect.options).forEach(option => {
-            option.style.display = option.dataset.uni === selectedUniId || option.value === '' ? '' : 'none';
-        });
-    }, { once: true });
-
-    document.getElementById('pais').addEventListener('change', function() {
-        tipoBrasilContainer.classList.toggle('hidden', this.value !== 'Brasil');
-    }, { once: true });
+    // Reset curso select
+    cursoSelect.innerHTML = '<option value="">Selecione o curso...</option>';
 }
 
 function hideForm() {
@@ -69,9 +62,51 @@ function scrollToInscricao() {
     document.getElementById('inscricao').scrollIntoView({ behavior: 'smooth' });
 }
 
+document.getElementById('universidade').addEventListener('change', function() {
+    const instituicaoId = this.value;
+    const cursoSelect = document.getElementById('curso');
+    const submitBtn = document.getElementById('submit-btn');
+    const submitSpinner = document.getElementById('submit-spinner');
+
+    if (instituicaoId) {
+        submitBtn.disabled = true;
+        submitSpinner.classList.remove('hidden');
+        fetch(`/load-courses/?instituicao_id=${instituicaoId}`, {
+            method: 'GET',
+            headers: {
+                'X-CSRFToken': getCookie('csrftoken')
+            }
+        })
+        .then(response => response.json())
+        .then(data => {
+            cursoSelect.innerHTML = '<option value="">Selecione o curso...</option>';
+            data.cursos.forEach(curso => {
+                const option = document.createElement('option');
+                option.value = curso.id;
+                option.textContent = `${curso.nome} (Preço: ${curso.preco} Kz)`;
+                cursoSelect.appendChild(option);
+            });
+            submitBtn.disabled = false;
+            submitSpinner.classList.add('hidden');
+        })
+        .catch(error => {
+            console.error('Erro ao carregar cursos:', error);
+            submitBtn.disabled = false;
+            submitSpinner.classList.add('hidden');
+        });
+    } else {
+        cursoSelect.innerHTML = '<option value="">Selecione o curso...</option>';
+    }
+});
+
 document.getElementById('applicationForm').addEventListener('submit', function(event) {
     event.preventDefault();
+    const submitBtn = document.getElementById('submit-btn');
+    const submitSpinner = document.getElementById('submit-spinner');
+
     if (this.checkValidity()) {
+        submitBtn.disabled = true;
+        submitSpinner.classList.remove('hidden');
         const formData = new FormData(this);
         
         fetch('/apply/', {
@@ -83,9 +118,7 @@ document.getElementById('applicationForm').addEventListener('submit', function(e
         })
         .then(response => response.json())
         .then(data => {
-            console.log('Dados recebidos:', data);
             if (data.success) {
-                // Redirecionamento direto sem alert
                 const form = document.createElement('form');
                 form.method = 'POST';
                 form.action = '/payments/create_checkout/';
@@ -102,13 +135,16 @@ document.getElementById('applicationForm').addEventListener('submit', function(e
                 document.body.appendChild(form);
                 form.submit();
             } else {
-                console.error('Erro na submissão:', data.error);
                 alert(`Erro: ${data.error}`);
+                submitBtn.disabled = false;
+                submitSpinner.classList.add('hidden');
             }
         })
         .catch(error => {
             console.error('Erro no fetch:', error);
             alert('Erro ao processar o formulário. Tente novamente.');
+            submitBtn.disabled = false;
+            submitSpinner.classList.add('hidden');
         });
     } else {
         this.classList.add('was-validated');

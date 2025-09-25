@@ -2,11 +2,13 @@ from django.shortcuts import render
 from django.http import JsonResponse
 from django.core.exceptions import ValidationError
 from django.db.models import Prefetch
-from .models import Pais, Instituicao, Curso, TaxaInscricao, Depoimento
-from django.core.files.uploadedfile import UploadedFile
+from .models import Pais, Instituicao, Curso, Depoimento, Candidatura
 import uuid
+import logging
 import os
 from django.conf import settings
+
+logger = logging.getLogger(__name__)
 
 def home(request):
     try:
@@ -23,6 +25,10 @@ def home(request):
             Prefetch('curso_set', queryset=Curso.objects.filter(ativo=True), to_attr='cursos_ativos')
         ))
     
+    # Separar cursos universitários e técnicos
+    cursos_universitarios = Curso.objects.filter(tipo='universitario', ativo=True).select_related('instituicao__pais').order_by('instituicao__pais__nome', 'instituicao__nome', 'nome')
+    cursos_tecnicos = Curso.objects.filter(tipo='tecnico', ativo=True).select_related('instituicao__pais').order_by('instituicao__pais__nome', 'instituicao__nome', 'nome')
+
     international_paises = Pais.objects.filter(nome__in=['Argentina', 'Uruguai', 'Espanha', 'Brasil', 'Portugal']).order_by('nome')
     
     international_data = {}
@@ -32,39 +38,27 @@ def home(request):
             ativo=True
         ).prefetch_related(
             Prefetch('curso_set', queryset=Curso.objects.filter(ativo=True), to_attr='cursos_ativos')
-        )[:3])
+        )[:3])  # Limitar a 3 instituições por país
         international_data[pais.nome] = insts
-    
-    national_fee = None
-    if angola:
-        national_fee = TaxaInscricao.objects.filter(pais=angola, ativo=True).first()
-    if not national_fee:
-        national_fee = type('obj', (object,), {'valor': 7500, 'moeda': 'AOA', 'tipo_taxa__nome': 'Nacional'})()
-    
-    standard_fee = TaxaInscricao.objects.filter(ativo=True, pais__nome='Argentina').first()
-    if not standard_fee:
-        standard_fee = type('obj', (object,), {'valor': 10000, 'moeda': 'AOA', 'tipo_taxa__nome': 'Standard'})()
-    
-    brasil_premium = TaxaInscricao.objects.filter(ativo=True, pais__nome='Brasil', tipo_taxa__nome__icontains='premium').first()
-    if not brasil_premium:
-        brasil_premium = type('obj', (object,), {'valor': 20000, 'moeda': 'AOA', 'tipo_taxa__nome': 'Premium'})()
     
     testimonials = list(Depoimento.objects.filter(is_active=True)[:3])
     
-    all_institutions = list(Instituicao.objects.filter(ativo=True).select_related('pais').order_by('pais__nome', 'nome'))
-    all_courses = list(Curso.objects.filter(ativo=True).select_related('instituicao__pais').order_by('instituicao__pais__nome', 'instituicao__nome', 'nome'))
+    all_institutions = list(Instituicao.objects.filter(ativo=True).select_related('pais').order_by('pais__nome', 'nome')[:10])
+    all_courses = list(Curso.objects.filter(ativo=True).select_related('instituicao__pais').order_by('instituicao__pais__nome', 'instituicao__nome', 'nome')[:20])
     international_paises_list = list(international_paises)
     
     context = {
         'national_institutions': national_institutions,
         'international_data': international_data,
-        'national_fee': national_fee,
-        'standard_fee': standard_fee,
-        'brasil_premium': brasil_premium,
+        'cursos_universitarios': cursos_universitarios,
+        'cursos_tecnicos': cursos_tecnicos,
         'testimonials': testimonials,
         'all_institutions': all_institutions,
         'all_courses': all_courses,
         'international_paises': international_paises_list,
+        'national_fee': {'valor': '7500', 'moeda': 'Kz'},
+        'standard_fee': {'valor': '10000', 'moeda': 'Kz'},
+        'brasil_premium': {'valor': '20000', 'moeda': 'Kz'},
     }
     return render(request, 'home.html', context)
 
@@ -99,47 +93,29 @@ def apply(request):
             except (Instituicao.DoesNotExist, Curso.DoesNotExist):
                 return JsonResponse({'error': 'Universidade ou curso inválido.'}, status=400)
 
-            taxa_inscricao = None
-            if bolsa_type == 'national':
-                taxa_inscricao = TaxaInscricao.objects.filter(pais=instituicao.pais, ativo=True).first()
-            else:
-                if pais_nome == 'Brasil' and tipo_brasil == 'premium':
-                    taxa_inscricao = TaxaInscricao.objects.filter(pais__nome='Brasil', tipo_taxa__nome__icontains='premium', ativo=True).first()
-                else:
-                    taxa_inscricao = TaxaInscricao.objects.filter(pais__nome=pais_nome, ativo=True).first() or TaxaInscricao.objects.filter(ativo=True).first()
-
-            if not taxa_inscricao:
-                return JsonResponse({'error': 'Taxa de inscrição não encontrada.'}, status=400)
-
-            # Gerar ID temporário para referência
             temp_id = str(uuid.uuid4())[:8].upper()
-
-            # Armazenar dados temporários na sessão (texto)
-            request.session['temp_candidatura'] = {
-                'temp_id': temp_id,
-                'nome_completo': nome_completo,
-                'idade': idade,
-                'bi': bi,
-                'telefone': telefone,
-                'email': email,
-                'bolsa_type': bolsa_type,
-                'pais_nome': pais_nome,
-                'tipo_brasil': tipo_brasil,
-                'universidade_id': universidade_id,
-                'curso_id': curso_id,
-                'taxa_inscricao_id': taxa_inscricao.id,
-                'termos': True,
-            }
-
-            # Salvar arquivo temporariamente
             temp_file_path = os.path.join(settings.MEDIA_ROOT, 'temp_certificados', f'{temp_id}_{certificado.name}')
             os.makedirs(os.path.dirname(temp_file_path), exist_ok=True)
             with open(temp_file_path, 'wb+') as temp_file:
                 for chunk in certificado.chunks():
                     temp_file.write(chunk)
-            request.session['temp_certificado_path'] = temp_file_path
 
-            request.session['temp_candidatura_id'] = temp_id  # Para referência no Prontu
+            candidatura = Candidatura(
+                codigo=temp_id,
+                nome_completo=nome_completo,
+                idade=int(idade) if idade else None,
+                bi=bi,
+                telefone=telefone,
+                email=email,
+                curso=curso,
+                instituicao=instituicao,
+                certificado=temp_file_path,
+                termos_aceites=True,
+                estado='pendente'
+            )
+            candidatura.save()
+
+            request.session['temp_candidatura_id'] = temp_id
 
             return JsonResponse({
                 'success': True,
@@ -151,6 +127,53 @@ def apply(request):
         except ValidationError as e:
             return JsonResponse({'error': str(e)}, status=400)
         except Exception as e:
+            logger.error(f"Erro ao processar o formulário: {str(e)}", exc_info=True)
             return JsonResponse({'error': f'Erro ao processar o formulário: {str(e)}'}, status=500)
 
     return JsonResponse({'error': 'Método não permitido.'}, status=405)
+
+def load_courses(request):
+    instituicao_id = request.GET.get('instituicao_id')
+    courses = Curso.objects.filter(instituicao_id=instituicao_id, ativo=True).values('id', 'nome', 'preco')
+    return JsonResponse({'cursos': list(courses)})
+
+def nacionais(request):
+    try:
+        angola = Pais.objects.get(nome='Angola')
+    except Pais.DoesNotExist:
+        angola = None
+    
+    national_institutions = []
+    if angola:
+        national_institutions = list(Instituicao.objects.filter(
+            pais=angola, 
+            ativo=True
+        ).prefetch_related(
+            Prefetch('curso_set', queryset=Curso.objects.filter(ativo=True), to_attr='cursos_ativos')
+        ))
+    
+    context = {
+        'national_institutions': national_institutions,
+        'national_fee': {'valor': '7500', 'moeda': 'Kz'},
+    }
+    return render(request, 'nacionais.html', context)
+
+def internacionais(request):
+    international_paises = Pais.objects.filter(nome__in=['Argentina', 'Uruguai', 'Espanha', 'Brasil', 'Portugal']).order_by('nome')
+    
+    international_data = {}
+    for pais in international_paises:
+        insts = list(Instituicao.objects.filter(
+            pais=pais, 
+            ativo=True
+        ).prefetch_related(
+            Prefetch('curso_set', queryset=Curso.objects.filter(ativo=True), to_attr='cursos_ativos')
+        ))
+        international_data[pais.nome] = insts
+    
+    context = {
+        'international_data': international_data,
+        'standard_fee': {'valor': '10000', 'moeda': 'Kz'},
+        'brasil_premium': {'valor': '20000', 'moeda': 'Kz'},
+    }
+    return render(request, 'internacionais.html', context)

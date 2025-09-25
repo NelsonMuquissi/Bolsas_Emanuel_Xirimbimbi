@@ -1,7 +1,7 @@
 # candidaturas/management/commands/popular_dados_exemplo.py
 from django.core.management.base import BaseCommand
 from django.db import transaction
-from candidaturas.models import Pais, TipoInstituicao, Instituicao, AreaEstudo, Curso, TipoTaxa, TaxaInscricao
+from candidaturas.models import Pais, TipoInstituicao, Instituicao, AreaEstudo, Curso
 
 class Command(BaseCommand):
     help = 'Popula o banco de dados com dados de exemplo'
@@ -13,10 +13,8 @@ class Command(BaseCommand):
             self.criar_paises()
             self.criar_tipos_instituicao()
             self.criar_areas_estudo()
-            self.criar_tipos_taxa()
             self.criar_instituicoes_nacionais()
             self.criar_instituicoes_internacionais()
-            self.criar_taxas_inscricao()
             self.criar_cursos()
         
         self.stdout.write(
@@ -78,21 +76,6 @@ class Command(BaseCommand):
                 self.stdout.write(f'✅ Área de Estudo criada: {area.nome}')
             else:
                 self.stdout.write(f'ℹ️  Área de Estudo já existe: {area.nome}')
-
-    def criar_tipos_taxa(self):
-        tipos_taxa = [
-            {'nome': 'Bolsa Nacional', 'descricao': 'Taxa para candidaturas nacionais'},
-            {'nome': 'Bolsa Internacional', 'descricao': 'Taxa para candidaturas internacionais'},
-            {'nome': 'Curso Premium', 'descricao': 'Taxa para cursos premium'},
-            {'nome': 'Curso Técnico', 'descricao': 'Taxa para cursos técnicos/profissionais'},
-        ]
-        
-        for data in tipos_taxa:
-            tipo, created = TipoTaxa.objects.get_or_create(**data)
-            if created:
-                self.stdout.write(f'✅ Tipo de Taxa criado: {tipo.nome}')
-            else:
-                self.stdout.write(f'ℹ️  Tipo de Taxa já existe: {tipo.nome}')
 
     def criar_instituicoes_nacionais(self):
         try:
@@ -187,48 +170,6 @@ class Command(BaseCommand):
         except Exception as e:
             self.stdout.write(f'⚠️  Erro ao criar instituições internacionais: {e}')
 
-    def criar_taxas_inscricao(self):
-        try:
-            tipo_nacional = TipoTaxa.objects.get(nome='Bolsa Nacional')
-            tipo_internacional = TipoTaxa.objects.get(nome='Bolsa Internacional')
-            tipo_premium = TipoTaxa.objects.get(nome='Curso Premium')
-            tipo_tecnico = TipoTaxa.objects.get(nome='Curso Técnico')
-            
-            angola = Pais.objects.get(nome='Angola')
-            portugal = Pais.objects.get(nome='Portugal')
-            
-            taxas = [
-                # Taxas por país
-                {'tipo_taxa': tipo_nacional, 'pais': angola, 'valor': 7500, 'moeda': 'Kz'},
-                {'tipo_taxa': tipo_internacional, 'valor': 10000, 'moeda': 'Kz'},
-                {'tipo_taxa': tipo_premium, 'valor': 20000, 'moeda': 'Kz'},
-                {'tipo_taxa': tipo_tecnico, 'pais': portugal, 'valor': 5000, 'moeda': 'Kz'},
-            ]
-            
-            for data in taxas:
-                # Para taxas com país, use pais como filtro
-                if 'pais' in data:
-                    taxa, created = TaxaInscricao.objects.get_or_create(
-                        tipo_taxa=data['tipo_taxa'],
-                        pais=data['pais'],
-                        defaults={'valor': data['valor'], 'moeda': data['moeda']}
-                    )
-                else:
-                    # Para taxas sem país específico
-                    taxa, created = TaxaInscricao.objects.get_or_create(
-                        tipo_taxa=data['tipo_taxa'],
-                        pais__isnull=True,
-                        defaults={'valor': data['valor'], 'moeda': data['moeda']}
-                    )
-                
-                if created:
-                    self.stdout.write(f'✅ Taxa criada: {taxa}')
-                else:
-                    self.stdout.write(f'ℹ️  Taxa já existe: {taxa}')
-                    
-        except Exception as e:
-            self.stdout.write(f'⚠️  Erro ao criar taxas: {e}')
-
     def criar_cursos(self):
         try:
             # Áreas de estudo
@@ -245,44 +186,51 @@ class Command(BaseCommand):
             ugs = Instituicao.objects.get(nome='Universidade Gregório Semedo')
             belas = Instituicao.objects.get(nome='Universidade Belas')
             ndunduma = Instituicao.objects.get(nome='Instituto Superior Politécnico Ndunduma')
+            lisboa = Instituicao.objects.get(nome='Centro de Formação Profissional de Lisboa')
             
-            cursos_nacionais = [
-                # UGS
-                {'nome': 'Direito', 'instituicao': ugs, 'area_estudo': direito, 'modalidade': 'presencial', 'duracao': 10},
-                {'nome': 'Economia', 'instituicao': ugs, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 8},
-                {'nome': 'Engenharia Informática', 'instituicao': ugs, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 10},
-                {'nome': 'Gestão de Empresas', 'instituicao': ugs, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 8},
-                {'nome': 'Contabilidade e Auditoria', 'instituicao': ugs, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 8},
+            cursos = [
+                # Universidade Gregório Semedo (Universitário)
+                {'nome': 'Direito', 'instituicao': ugs, 'area_estudo': direito, 'modalidade': 'presencial', 'duracao': 10, 'tipo': 'universitario', 'preco': 7500},
+                {'nome': 'Economia', 'instituicao': ugs, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 8, 'tipo': 'universitario', 'preco': 7000},
+                {'nome': 'Engenharia Informática', 'instituicao': ugs, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 10, 'tipo': 'universitario', 'preco': 8000},
+                {'nome': 'Gestão de Empresas', 'instituicao': ugs, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 8, 'tipo': 'universitario', 'preco': 7000},
+                {'nome': 'Contabilidade e Auditoria', 'instituicao': ugs, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 8, 'tipo': 'universitario', 'preco': 7000},
                 
-                # Belas
-                {'nome': 'Arquitetura', 'instituicao': belas, 'area_estudo': arquitetura, 'modalidade': 'presencial', 'duracao': 10},
-                {'nome': 'Engenharia Civil', 'instituicao': belas, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 10},
-                {'nome': 'Ciências da Comunicação', 'instituicao': belas, 'area_estudo': comunicacao, 'modalidade': 'presencial', 'duracao': 8},
-                {'nome': 'Relações Internacionais', 'instituicao': belas, 'area_estudo': psicologia, 'modalidade': 'presencial', 'duracao': 8},
-                {'nome': 'Psicologia', 'instituicao': belas, 'area_estudo': psicologia, 'modalidade': 'presencial', 'duracao': 10},
+                # Universidade Belas (Universitário)
+                {'nome': 'Arquitetura', 'instituicao': belas, 'area_estudo': arquitetura, 'modalidade': 'presencial', 'duracao': 10, 'tipo': 'universitario', 'preco': 8500},
+                {'nome': 'Engenharia Civil', 'instituicao': belas, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 10, 'tipo': 'universitario', 'preco': 8000},
+                {'nome': 'Ciências da Comunicação', 'instituicao': belas, 'area_estudo': comunicacao, 'modalidade': 'presencial', 'duracao': 8, 'tipo': 'universitario', 'preco': 7500},
+                {'nome': 'Relações Internacionais', 'instituicao': belas, 'area_estudo': psicologia, 'modalidade': 'presencial', 'duracao': 8, 'tipo': 'universitario', 'preco': 7500},
+                {'nome': 'Psicologia', 'instituicao': belas, 'area_estudo': psicologia, 'modalidade': 'presencial', 'duracao': 10, 'tipo': 'universitario', 'preco': 8000},
                 
-                # Ndunduma
-                {'nome': 'Engenharia Electrotécnica', 'instituicao': ndunduma, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 10},
-                {'nome': 'Engenharia Mecânica', 'instituicao': ndunduma, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 10},
-                {'nome': 'Gestão Industrial', 'instituicao': ndunduma, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 8},
-                {'nome': 'Informática de Gestão', 'instituicao': ndunduma, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 8},
-                {'nome': 'Enfermagem', 'instituicao': ndunduma, 'area_estudo': saude, 'modalidade': 'presencial', 'duracao': 8},
+                # Instituto Superior Politécnico Ndunduma (Técnico)
+                {'nome': 'Engenharia Electrotécnica', 'instituicao': ndunduma, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 6, 'tipo': 'tecnico', 'preco': 5000},
+                {'nome': 'Engenharia Mecânica', 'instituicao': ndunduma, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 6, 'tipo': 'tecnico', 'preco': 5000},
+                {'nome': 'Gestão Industrial', 'instituicao': ndunduma, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 4, 'tipo': 'tecnico', 'preco': 4500},
+                {'nome': 'Informática de Gestão', 'instituicao': ndunduma, 'area_estudo': engenharia, 'modalidade': 'presencial', 'duracao': 4, 'tipo': 'tecnico', 'preco': 4500},
+                {'nome': 'Enfermagem', 'instituicao': ndunduma, 'area_estudo': saude, 'modalidade': 'presencial', 'duracao': 6, 'tipo': 'tecnico', 'preco': 5500},
+                
+                # Centro de Formação Profissional de Lisboa (Técnico)
+                {'nome': 'Técnico em Informática', 'instituicao': lisboa, 'area_estudo': educacao, 'modalidade': 'presencial', 'duracao': 3, 'tipo': 'tecnico', 'preco': 4000},
+                {'nome': 'Formação em Gestão', 'instituicao': lisboa, 'area_estudo': economia, 'modalidade': 'presencial', 'duracao': 3, 'tipo': 'tecnico', 'preco': 4000},
             ]
             
-            for data in cursos_nacionais:
+            for data in cursos:
                 curso, created = Curso.objects.get_or_create(
                     nome=data['nome'],
                     instituicao=data['instituicao'],
                     defaults={
                         'area_estudo': data['area_estudo'],
                         'modalidade': data['modalidade'],
-                        'duracao': data['duracao']
+                        'duracao': data['duracao'],
+                        'tipo': data['tipo'],
+                        'preco': data['preco'],
                     }
                 )
                 if created:
-                    self.stdout.write(f'✅ Curso Nacional criado: {curso.nome} - {curso.instituicao.nome}')
+                    self.stdout.write(f'✅ Curso criado: {curso.nome} - {curso.instituicao.nome} (Tipo: {curso.tipo}, Preço: {curso.preco} Kz)')
                 else:
-                    self.stdout.write(f'ℹ️  Curso Nacional já existe: {curso.nome} - {curso.instituicao.nome}')
-                    
+                    self.stdout.write(f'ℹ️  Curso já existe: {curso.nome} - {curso.instituicao.nome}')
+
         except Exception as e:
             self.stdout.write(f'⚠️  Erro ao criar cursos: {e}')

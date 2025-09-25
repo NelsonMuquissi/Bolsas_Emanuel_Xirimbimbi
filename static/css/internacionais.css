@@ -1,0 +1,364 @@
+:root {
+  --bg-deep: #0b1026;
+  --bg-elev: #12183a;
+  --text: #ffffff;
+  --muted: #b8c1cc;
+  --brand: #f4c430;
+  --brand-2: #7aa6ff;
+  --success: #20c997;
+  --premium: #ffd700;
+  --standard: #6c757d;
+}
+
+html, body {
+  box-sizing: border-box;
+  font-family: 'Poppins', system-ui, -apple-system, Segoe UI, Roboto, 'Helvetica Neue', Arial, 'Noto Sans', 'Liberation Sans', sans-serif;
+}
+
+body {
+  background: radial-gradient(1200px 600px at 10% 0%, #18204d 0%, var(--bg-deep) 40%, #0a0f24 100%);
+  color: var(--text);
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Navbar */
+.bg-transparent {
+  background: rgba(10, 15, 36, 0.95);
+  backdrop-filter: saturate(140%) blur(10px);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Títulos */
+.section-title {
+  color: var(--text);
+  font-weight: 700;
+  letter-spacing: 0.5px;
+  font-size: 2.8rem;
+  margin-bottom: 1rem;
+  background: linear-gradient(135deg, #ffffff, #f4c430);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.section-sub {
+  color: var(--text);
+  opacity: 0.9;
+  font-size: 1.2rem;
+  font-weight: 300;
+}
+
+.separator {
+  width: 80px;
+  height: 4px;
+  background: linear-gradient(90deg, var(--brand), transparent);
+  border-radius: 2px;
+}
+
+#internacionais {
+  padding-top: 120px;
+}
+
+/* Filtros */
+.filters-card {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(10px);
+}
+
+.btn-filter {
+  background: rgba(255, 255, 255, 0.1);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 20px;
+  padding: 0.5rem 1.25rem;
+  font-size: 0.9rem;
+  transition: all 0.3s ease;
+}
+
+.btn-filter.active,
+.btn-filter:hover {
+  background: var(--brand);
+  color: #111;
+  border-color: var(--brand);
+  transform: translateY(-2px);
+}
+
+/* Abas */
+.country-tab {
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--text);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  margin: 0 5px;
+  padding: 0.75rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.country-tab.active,
+.country-tab:hover {
+  background: linear-gradient(135deg, var(--brand), #ffd86b);
+  color: #111;
+  border-color: var(--brand);
+  transform: translateY(-2px);
+}
+
+/* Estatísticas */
+.stats-card {
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.stat-item h4 {
+  font-weight: 700;
+}
+
+/* Grid de Instituições */
+.institutions-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.institution-card {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.08), rgba(255, 255, 255, 0.03));
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 15px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  backdrop-filter: blur(10px);
+}
+
+.institution-card:hover {
+  transform: translateY(-5px);
+  border-color: rgba(255, 255, 255, 0.3);
+  box-shadow: 0 15px 35px rgba(0, 0, 0, 0.3);
+}
+
+.card-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.card-body {
+  padding: 1.5rem;
+}
+
+.card-footer {
+  padding: 1rem 1.5rem;
+  background: rgba(255, 255, 255, 0.03);
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Badges */
+.badge {
+  font-size: 0.75rem;
+  font-weight: 500;
+  padding: 0.35rem 0.75rem;
+}
+
+.bg-premium {
+  background: linear-gradient(135deg, var(--premium), #ffed4e) !important;
+  color: #000 !important;
+}
+
+.bg-standard {
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: var(--text) !important;
+}
+
+.bg-modalidade {
+  background: rgba(122, 166, 255, 0.2) !important;
+  color: var(--brand-2) !important;
+  border: 1px solid rgba(122, 166, 255, 0.3);
+}
+
+/* Lista de Cursos Compacta */
+.cursos-lista {
+  transition: all 0.3s ease;
+}
+
+.curso-item {
+  padding: 1rem 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.curso-item:last-child {
+  border-bottom: none;
+}
+
+.curso-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 0.5rem;
+}
+
+.curso-header h6 {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin: 0;
+  flex: 1;
+  margin-right: 1rem;
+}
+
+.curso-details {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+}
+
+.more-cursos {
+  padding: 1rem 0 0;
+}
+
+.btn-outline-brand {
+  border: 1px solid var(--brand);
+  color: var(--brand);
+  background: transparent;
+  border-radius: 20px;
+  padding: 0.35rem 1rem;
+  font-size: 0.8rem;
+  transition: all 0.3s ease;
+}
+
+.btn-outline-brand:hover {
+  background: var(--brand);
+  color: #111;
+  transform: translateY(-2px);
+}
+
+/* Botão Principal */
+.btn-brand {
+  background: linear-gradient(135deg, var(--brand), #ffd86b);
+  color: #111;
+  font-weight: 600;
+  border: none;
+  border-radius: 25px;
+  padding: 0.5rem 1.5rem;
+  transition: all 0.3s ease;
+}
+
+.btn-brand:hover {
+  background: linear-gradient(135deg, #ffd86b, var(--brand));
+  color: #111;
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(244, 196, 48, 0.4);
+}
+
+/* Modal */
+.modal-content {
+  border-radius: 15px;
+  border: none;
+}
+
+.modal-header {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+}
+
+.table th {
+  border-bottom: 2px solid var(--brand);
+  color: #111;
+  font-weight: 600;
+}
+
+.table td {
+  vertical-align: middle;
+  color: #333;
+}
+
+/* Ícones Interativos */
+.toggle-cursos {
+  cursor: pointer;
+  transition: all 0.3s ease;
+  font-size: 1.1rem;
+}
+
+.toggle-cursos:hover {
+  color: var(--brand) !important;
+  transform: scale(1.1);
+}
+
+/* Responsividade */
+@media (max-width: 768px) {
+  .institutions-grid {
+    grid-template-columns: 1fr;
+    gap: 1rem;
+  }
+  
+  .section-title {
+    font-size: 2.2rem;
+  }
+  
+  .section-sub {
+    font-size: 1.1rem;
+  }
+  
+  .country-tab {
+    margin: 2px;
+    padding: 0.6rem 1rem;
+    font-size: 0.9rem;
+  }
+  
+  .curso-header {
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .curso-details {
+    gap: 0.25rem;
+  }
+}
+
+@media (max-width: 576px) {
+  .section-title {
+    font-size: 1.8rem;
+  }
+  
+  .filters-card .row {
+    flex-direction: column;
+    text-align: center;
+  }
+  
+  .btn-filter {
+    padding: 0.4rem 1rem;
+    font-size: 0.8rem;
+  }
+}
+
+/* Animações */
+.institution-card {
+  animation: fadeInUp 0.6s ease;
+}
+
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.curso-item {
+  animation: slideIn 0.4s ease;
+}
+
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translateX(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
