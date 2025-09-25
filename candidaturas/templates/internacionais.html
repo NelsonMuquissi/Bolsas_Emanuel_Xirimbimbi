@@ -11,6 +11,38 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.css" rel="stylesheet" />
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" href="{% static 'css/internacionais.css' %}" />
+  <style>
+    /* Reset e garantia de funcionamento */
+    * {
+      box-sizing: border-box;
+    }
+    
+    body.modal-open {
+      overflow: hidden;
+      padding-right: 0 !important;
+    }
+    
+    .modal {
+      z-index: 1055 !important;
+    }
+    
+    .modal-backdrop {
+      z-index: 1050 !important;
+    }
+    
+    .btn-close:focus {
+      box-shadow: none !important;
+    }
+    
+    .country-tab {
+      margin: 0 5px;
+    }
+    
+    .nav-pills .nav-link.active {
+      background-color: #0d6efd;
+      border-color: #0d6efd;
+    }
+  </style>
 </head>
 <body class="d-flex flex-column min-vh-100">
   <!-- NAVBAR -->
@@ -49,29 +81,7 @@
         </div>
       </div>
 
-      <!-- Filtros Rápidos -->
-      <div class="row mb-4">
-        <div class="col-12">
-          <div class="filters-card p-3 rounded-3">
-            <div class="row align-items-center">
-              <div class="col-md-4 mb-2 mb-md-0">
-                <h6 class="text-white mb-2"><i class="bi bi-funnel me-2"></i>Filtrar por:</h6>
-              </div>
-              <div class="col-md-8">
-                <div class="d-flex flex-wrap gap-2">
-                  <button class="btn btn-filter active" data-filter="all">Todos</button>
-                  <button class="btn btn-filter" data-filter="premium">Premium</button>
-                  <button class="btn btn-filter" data-filter="padrao">Padrão</button>
-                  <button class="btn btn-filter" data-filter="presencial">Presencial</button>
-                  <button class="btn btn-filter" data-filter="online">Online</button>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Layout em Abas -->
+      <!-- Layout em Abas SIMPLIFICADO -->
       <div class="international-tabs">
         <ul class="nav nav-pills mb-4 justify-content-center" id="countryTabs" role="tablist">
           {% for pais_nome, insts in international_data.items %}
@@ -96,154 +106,129 @@
                role="tabpanel" 
                aria-labelledby="tab-{{ forloop.counter }}">
             
-            <!-- Estatísticas do País -->
-            <div class="row mb-4">
-              <div class="col-12">
-                <div class="stats-card p-3 rounded-3">
-                  <div class="row text-center">
-                    <div class="col-md-3 col-6 mb-3 mb-md-0">
-                      <div class="stat-item">
-                        <h4 class="text-brand mb-1">{{ insts|length }}</h4>
-                        <small class="text-white-70">Instituições</small>
-                      </div>
-                    </div>
-                    <div class="col-md-3 col-6 mb-3 mb-md-0">
-                      <div class="stat-item">
-                        <h4 class="text-brand mb-1">{{ insts|length }}</h4>
-                        <small class="text-white-70">Cursos Disponíveis</small>
-                      </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                      <div class="stat-item">
-                        <h4 class="text-brand mb-1">{{ insts|length }}</h4>
-                        <small class="text-white-70">Modalidades</small>
-                      </div>
-                    </div>
-                    <div class="col-md-3 col-6">
-                      <div class="stat-item">
-                        <h4 class="text-brand mb-1">{{ insts|length }}</h4>
-                        <small class="text-white-70">Áreas de Estudo</small>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <!-- Grid de Instituições -->
-            <div class="institutions-grid">
+            <!-- Grid de Instituições SIMPLIFICADO -->
+            <div class="row">
               {% for inst in insts %}
-              <div class="institution-card" data-premium="{{ inst.premium|lower }}" data-modalidade="{{ inst.cursos_ativos.0.get_modalidade_display|lower }}">
-                <div class="card-header">
-                  <div class="d-flex justify-content-between align-items-start">
+              <div class="col-lg-6 col-xl-4 mb-4">
+                <div class="institution-card rounded-3 p-4 h-100" style="background: rgba(255,255,255,0.05); border: 1px solid rgba(255,255,255,0.1);">
+                  <div class="d-flex justify-content-between align-items-start mb-3">
                     <div>
-                      <h5 class="text-white mb-1">{{ inst.nome }}</h5>
-                      <div class="d-flex flex-wrap gap-2 mt-2">
-                        <span class="badge {% if inst.premium %}bg-premium{% else %}bg-standard{% endif %}">
-                          <i class="bi bi-{% if inst.premium %}star-fill{% else %}building{% endif %} me-1"></i>
+                      <h5 class="text-white mb-2">{{ inst.nome }}</h5>
+                      <div class="d-flex flex-wrap gap-2">
+                        <span class="badge {% if inst.premium %}bg-warning text-dark{% else %}bg-secondary{% endif %}">
                           {% if inst.premium %}Premium{% else %}Padrão{% endif %}
                         </span>
-                        <span class="badge bg-modalidade">
-                          <i class="bi bi-{% if inst.cursos_ativos.0.modalidade == 'P' %}person{% else %}laptop{% endif %} me-1"></i>
+                        <span class="badge bg-info">
                           {{ inst.cursos_ativos.0.get_modalidade_display }}
                         </span>
+                        <span class="badge bg-success">{{ inst.cursos_ativos|length }} cursos</span>
                       </div>
                     </div>
-                    <i class="bi bi-chevron-down text-white-50 toggle-cursos"></i>
                   </div>
-                </div>
 
-                <div class="card-body">
-                  <!-- Lista Compacta de Cursos -->
-                  <div class="cursos-lista compact-view">
-                    {% for curso in inst.cursos_ativos|slice:":3" %}
-                    <div class="curso-item">
-                      <div class="curso-header">
-                        <h6 class="text-white mb-1">{{ curso.nome }}</h6>
-                        <span class="text-brand small fw-semibold">{{ curso.duracao|default:"N/D" }} semestres</span>
-                      </div>
-                      <div class="curso-details">
-                        <span class="text-white-70 small">{{ curso.area_estudo.nome|default:"Área não especificada" }}</span>
-                        <span class="text-white-70 small">•</span>
-                        <span class="text-white-70 small">{{ curso.get_tipo_display }}</span>
-                        <span class="text-white-70 small">•</span>
-                        <span class="text-brand small fw-semibold">{{ curso.preco|default:"Sob consulta" }} Kz</span>
+                  <div class="mb-3">
+                    <p class="text-white-70 mb-2">
+                      <i class="bi bi-geo-alt me-2"></i>{{ inst.pais.nome }}
+                    </p>
+                  </div>
+
+                  <!-- Cursos (mostrar apenas 2) -->
+                  <div class="mb-3">
+                    <h6 class="text-white mb-2">Cursos disponíveis:</h6>
+                    {% for curso in inst.cursos_ativos|slice:":2" %}
+                    <div class="curso-item bg-dark bg-opacity-25 rounded p-2 mb-2">
+                      <div class="d-flex justify-content-between align-items-center">
+                        <div>
+                          <strong class="text-white">{{ curso.nome }}</strong>
+                          <br>
+                          <small class="text-white-50">
+                            {{ curso.duracao|default:"N/D" }} semestres • 
+                            {{ curso.get_modalidade_display }}
+                          </small>
+                        </div>
+                        <span class="badge bg-primary">{{ curso.preco|default:"Consultar" }} Kz</span>
                       </div>
                     </div>
                     {% endfor %}
-
-                    {% if inst.cursos_ativos|length > 3 %}
-                    <div class="more-cursos text-center">
-                      <button class="btn btn-sm btn-outline-brand view-all-cursos" data-inst="{{ inst.id }}">
-                        +{{ inst.cursos_ativos|length|add:"-3" }} cursos disponíveis
-                      </button>
-                    </div>
-                    {% endif %}
                   </div>
 
-                  <!-- Modal com todos os cursos -->
-                  <div class="modal fade" id="modalCursos{{ inst.id }}" tabindex="-1">
-                    <div class="modal-dialog modal-lg">
-                      <div class="modal-content">
-                        <div class="modal-header">
-                          <h5 class="modal-title text-dark">{{ inst.nome }} - Todos os Cursos</h5>
-                          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                        </div>
-                        <div class="modal-body">
-                          <div class="table-responsive">
-                            <table class="table table-hover">
-                              <thead>
-                                <tr>
-                                  <th>Curso</th>
-                                  <th>Duração</th>
-                                  <th>Área</th>
-                                  <th>Modalidade</th>
-                                  <th>Preço</th>
-                                  <th>Ação</th>
-                                </tr>
-                              </thead>
-                              <tbody>
-                                {% for curso in inst.cursos_ativos %}
-                                <tr>
-                                  <td>
-                                    <strong class="text-dark">{{ curso.nome }}</strong>
-                                  </td>
-                                  <td class="text-dark">{{ curso.duracao|default:"N/D" }} sem.</td>
-                                  <td class="text-dark">{{ curso.area_estudo.nome|default:"-" }}</td>
-                                  <td>
-                                    <span class="badge bg-light text-dark">{{ curso.get_modalidade_display }}</span>
-                                  </td>
-                                  <td class="text-dark fw-semibold">{{ curso.preco|default:"Consultar" }} Kz</td>
-                                  <td>
-                                    <a href="{% url 'home' %}#inscricao" class="btn btn-sm btn-brand">Candidatar</a>
-                                  </td>
-                                </tr>
-                                {% endfor %}
-                              </tbody>
-                            </table>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
+                  <!-- Botão para ver todos os cursos -->
+                  {% if inst.cursos_ativos|length > 2 %}
+                  <div class="text-center mb-3">
+                    <button type="button" class="btn btn-outline-light btn-sm" 
+                            data-bs-toggle="modal" 
+                            data-bs-target="#modalCursos{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                      Ver todos os {{ inst.cursos_ativos|length }} cursos
+                    </button>
                   </div>
-                </div>
+                  {% endif %}
 
-                <div class="card-footer">
-                  <div class="d-flex justify-content-between align-items-center">
-                    <small class="text-white-70">
-                      <i class="bi bi-geo-alt me-1"></i>{{ inst.pais.nome }}
-                    </small>
-                    <a href="{% url 'home' %}#inscricao" class="btn btn-sm btn-brand">
+                  <div class="text-center">
+                    <a href="{% url 'home' %}#inscricao" class="btn btn-primary">
                       <i class="bi bi-send me-1"></i>Candidatar-se
                     </a>
                   </div>
                 </div>
               </div>
+
+              <!-- Modal para esta instituição -->
+              <div class="modal fade" id="modalCursos{{ forloop.parentloop.counter }}_{{ forloop.counter }}" tabindex="-1" aria-labelledby="modalLabel{{ forloop.parentloop.counter }}_{{ forloop.counter }}" aria-hidden="true">
+                <div class="modal-dialog modal-dialog-centered modal-lg">
+                  <div class="modal-content">
+                    <div class="modal-header bg-primary text-white">
+                      <h5 class="modal-title" id="modalLabel{{ forloop.parentloop.counter }}_{{ forloop.counter }}">
+                        <i class="bi bi-building me-2"></i>{{ inst.nome }} - {{ pais_nome }}
+                      </h5>
+                      <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                    </div>
+                    <div class="modal-body">
+                      <p class="text-muted mb-3">Total de cursos disponíveis: {{ inst.cursos_ativos|length }}</p>
+                      
+                      <div class="table-responsive">
+                        <table class="table table-hover">
+                          <thead>
+                            <tr>
+                              <th>Curso</th>
+                              <th>Duração</th>
+                              <th>Área</th>
+                              <th>Modalidade</th>
+                              <th>Taxa de Inscrição</th>
+                              <th>Ação</th>
+                            </tr>
+                          </thead>
+                          <tbody>
+                            {% for curso in inst.cursos_ativos %}
+                            <tr>
+                              <td><strong>{{ curso.nome }}</strong></td>
+                              <td>{{ curso.duracao|default:"N/D" }} semestres</td>
+                              <td>{{ curso.area_estudo.nome|default:"-" }}</td>
+                              <td>
+                                <span class="badge bg-info text-dark">
+                                  {{ curso.get_modalidade_display }}
+                                </span>
+                              </td>
+                              <td class="fw-semibold text-primary">{{ curso.preco|default:"Consultar" }} Kz</td>
+                              <td>
+                                <a href="{% url 'home' %}#inscricao" class="btn btn-sm btn-primary">Candidatar</a>
+                              </td>
+                            </tr>
+                            {% endfor %}
+                          </tbody>
+                        </table>
+                      </div>
+                    </div>
+                    <div class="modal-footer">
+                      <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fechar</button>
+                      <a href="{% url 'home' %}#inscricao" class="btn btn-primary">Candidatar-se Agora</a>
+                    </div>
+                  </div>
+                </div>
+              </div>
               {% empty %}
-              <div class="no-institutions text-center py-5">
+              <div class="col-12 text-center py-5">
                 <i class="bi bi-building-slash display-1 text-white-50 mb-3"></i>
-                <h5 class="text-white mb-2">Nenhuma instituição disponível</h5>
-                <p class="text-white-70">As oportunidades em {{ pais_nome }} serão disponibilizadas em breve.</p>
+                <h5 class="text-white mb-2">Nenhuma instituição disponível em {{ pais_nome }}</h5>
+                <p class="text-white-70">As oportunidades internacionais serão disponibilizadas em breve.</p>
               </div>
               {% endfor %}
             </div>
@@ -264,72 +249,54 @@
 
   <!-- FOOTER -->
   <footer style="background-color: #0b1026 !important;" class="footer py-4 bg-dark mt-auto">
-    <div class="container d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3">
-      <div class="small text-white-50">© 2025 Bolsa de Estudos Emanuel Xirimbimbi. Todos os direitos reservados.</div>
-      <div class="small text-white-50">Apoio logístico: <strong>Fly Squad</strong></div>
-      <div class="small text-white-50">Desenvolvido por: <a target="_blank" href="https://nelsonm.vercel.app/" class="text-brand text-decoration-none">Nelson Muquissi</a></div>
-      <div class="d-flex gap-3">
-        <a class="text-decoration-none text-white-50" href="https://www.instagram.com/emanuelxirimbimbi_oficial/" target="_blank" rel="noopener" aria-label="Instagram"><i class="bi bi-instagram fs-5"></i></a>
-        <a class="text-decoration-none text-white-50" href="https://www.linkedin.com/in/emanuel-xirimbimbi-186aa134/?originalSubdomain=ao" target="_blank" rel="noopener" aria-label="LinkedIn"><i class="bi bi-linkedin fs-5"></i></a>
+    <div class="container">
+      <div class="row align-items-center">
+        <div class="col-md-4 text-center text-md-start">
+          <div class="small text-white-50">© 2025 Bolsa de Estudos Emanuel Xirimbimbi</div>
+        </div>
+        <div class="col-md-4 text-center">
+          <div class="small text-white-50">Apoio logístico: <strong>Fly Squad</strong></div>
+        </div>
+        <div class="col-md-4 text-center text-md-end">
+          <div class="small text-white-50">
+            Desenvolvido por: <a target="_blank" href="https://nelsonm.vercel.app/" class="text-brand text-decoration-none">Nelson Muquissi</a>
+          </div>
+        </div>
       </div>
     </div>
   </footer>
 
   <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
   <script>
-    document.addEventListener('DOMContentLoaded', function () {
-      // Filtros
-      const filterButtons = document.querySelectorAll('.btn-filter');
-      const institutionCards = document.querySelectorAll('.institution-card');
+    // Script mínimo apenas para garantir o funcionamento
+    document.addEventListener('DOMContentLoaded', function() {
+      console.log('Página Bolsas Internacionais carregada - modais devem funcionar com Bootstrap nativo');
       
-      filterButtons.forEach(button => {
-        button.addEventListener('click', function() {
-          const filter = this.getAttribute('data-filter');
-          
-          // Ativar botão
-          filterButtons.forEach(btn => btn.classList.remove('active'));
-          this.classList.add('active');
-          
-          // Filtrar cards
-          institutionCards.forEach(card => {
-            if (filter === 'all') {
-              card.style.display = 'block';
-            } else {
-              const isPremium = card.getAttribute('data-premium') === 'true';
-              const modalidade = card.getAttribute('data-modalidade');
-              
-              if ((filter === 'premium' && isPremium) ||
-                  (filter === 'padrao' && !isPremium) ||
-                  (filter === 'presencial' && modalidade === 'presencial') ||
-                  (filter === 'online' && modalidade === 'online')) {
-                card.style.display = 'block';
-              } else {
-                card.style.display = 'none';
-              }
-            }
+      // Apenas para debug - verificar se os modais estão sendo encontrados
+      const modals = document.querySelectorAll('.modal');
+      console.log(`Encontrados ${modals.length} modais na página`);
+      
+      // Garantir que o body não tenha padding quando modal abrir
+      document.addEventListener('show.bs.modal', function() {
+        document.body.style.paddingRight = '0px';
+      });
+
+      // Filtros simplificados (se necessário)
+      const filterButtons = document.querySelectorAll('.btn-filter');
+      if (filterButtons.length > 0) {
+        filterButtons.forEach(button => {
+          button.addEventListener('click', function() {
+            const filter = this.getAttribute('data-filter');
+            
+            // Ativar botão
+            filterButtons.forEach(btn => btn.classList.remove('active'));
+            this.classList.add('active');
+            
+            // Aqui você pode adicionar lógica de filtro se necessário
+            console.log('Filtrar por:', filter);
           });
         });
-      });
-      
-      // Expandir/contrair cursos
-      document.querySelectorAll('.toggle-cursos').forEach(toggle => {
-        toggle.addEventListener('click', function() {
-          const card = this.closest('.institution-card');
-          const cursosLista = card.querySelector('.cursos-lista');
-          cursosLista.classList.toggle('expanded');
-          this.classList.toggle('bi-chevron-down');
-          this.classList.toggle('bi-chevron-up');
-        });
-      });
-      
-      // Ver todos os cursos
-      document.querySelectorAll('.view-all-cursos').forEach(btn => {
-        btn.addEventListener('click', function() {
-          const instId = this.getAttribute('data-inst');
-          const modal = new bootstrap.Modal(document.getElementById('modalCursos' + instId));
-          modal.show();
-        });
-      });
+      }
     });
   </script>
 </body>

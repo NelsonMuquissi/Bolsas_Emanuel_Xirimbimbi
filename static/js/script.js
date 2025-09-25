@@ -18,8 +18,6 @@ function showForm(type) {
     const scholarshipOptions = document.getElementById('scholarship-options');
     const formTitle = document.getElementById('form-title');
     const bolsaType = document.getElementById('bolsa-type');
-    const paisContainer = document.getElementById('pais-container');
-    const tipoBrasilContainer = document.getElementById('tipo-brasil-container');
     const internationalNote = document.getElementById('international-note');
     const universidadeSelect = document.getElementById('universidade');
     const cursoSelect = document.getElementById('curso');
@@ -30,25 +28,34 @@ function showForm(type) {
 
     if (type === 'national') {
         formTitle.textContent = 'Candidatura — Bolsa Nacional';
-        paisContainer.classList.add('hidden');
-        tipoBrasilContainer.classList.add('hidden');
         internationalNote.classList.add('hidden');
+        // Mostrar apenas universidades de Angola
         Array.from(universidadeSelect.options).forEach(option => {
-            option.style.display = (option.dataset.pais === 'Angola' || option.value === '') ? '' : 'none';
+            if (option.value !== '') {
+                option.style.display = option.dataset.pais === 'Angola' ? '' : 'none';
+            } else {
+                option.style.display = ''; // Manter a opção padrão visível
+            }
         });
     } else {
         formTitle.textContent = 'Candidatura — Bolsa Internacional';
-        paisContainer.classList.add('hidden'); // Removido o seletor de país para internacionais
         internationalNote.classList.remove('hidden');
-        tipoBrasilContainer.classList.remove('hidden');
+        // Mostrar apenas universidades internacionais (não Angola)
         Array.from(universidadeSelect.options).forEach(option => {
-            option.style.display = (option.dataset.pais !== 'Angola' || option.value === '') ? '' : 'none';
+            if (option.value !== '') {
+                option.style.display = option.dataset.pais !== 'Angola' ? '' : 'none';
+            } else {
+                option.style.display = ''; // Manter a opção padrão visível
+            }
         });
     }
 
-    // Reset curso select
+    // Reset seleções
+    universidadeSelect.value = '';
     cursoSelect.innerHTML = '<option value="">Selecione o curso...</option>';
 }
+
+// O resto do JavaScript permanece igual...
 
 function hideForm() {
     const form = document.getElementById('application-form');

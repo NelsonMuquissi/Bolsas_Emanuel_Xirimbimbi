@@ -43,8 +43,13 @@ def home(request):
     
     testimonials = list(Depoimento.objects.filter(is_active=True)[:3])
     
-    all_institutions = list(Instituicao.objects.filter(ativo=True).select_related('pais').order_by('pais__nome', 'nome')[:10])
-    all_courses = list(Curso.objects.filter(ativo=True).select_related('instituicao__pais').order_by('instituicao__pais__nome', 'instituicao__nome', 'nome')[:20])
+    # INSTITUIÇÕES PARA O FORMULÁRIO - SEPARADAS
+    national_institutions_form = list(Instituicao.objects.filter(pais__nome='Angola', ativo=True).select_related('pais').order_by('nome'))
+    international_institutions_form = list(Instituicao.objects.filter(ativo=True).exclude(pais__nome='Angola').select_related('pais').order_by('pais__nome', 'nome'))
+    
+    # Combinar todas as instituições para o dropdown (mas vamos filtrar via JavaScript)
+    all_institutions = national_institutions_form + international_institutions_form
+    
     international_paises_list = list(international_paises)
     
     context = {
@@ -54,13 +59,13 @@ def home(request):
         'cursos_tecnicos': cursos_tecnicos,
         'testimonials': testimonials,
         'all_institutions': all_institutions,
-        'all_courses': all_courses,
         'international_paises': international_paises_list,
         'national_fee': {'valor': '7500', 'moeda': 'Kz'},
         'standard_fee': {'valor': '10000', 'moeda': 'Kz'},
         'brasil_premium': {'valor': '20000', 'moeda': 'Kz'},
     }
     return render(request, 'home.html', context)
+
 
 def apply(request):
     if request.method == 'POST':
@@ -71,13 +76,12 @@ def apply(request):
             telefone = request.POST.get('tel')
             email = request.POST.get('email')
             bolsa_type = request.POST.get('bolsa-type')
-            pais_nome = request.POST.get('pais')
-            tipo_brasil = request.POST.get('tipo-brasil')
             universidade_id = request.POST.get('universidade')
             curso_id = request.POST.get('curso')
             termos = request.POST.get('termos')
             certificado = request.FILES.get('certificado')
 
+            # Validações básicas
             if not all([nome_completo, telefone, email, universidade_id, curso_id]):
                 return JsonResponse({'error': 'Todos os campos obrigatórios devem ser preenchidos.'}, status=400)
             
@@ -87,19 +91,41 @@ def apply(request):
             if not certificado or not certificado.name.endswith('.pdf'):
                 return JsonResponse({'error': 'Por favor, envie um certificado em formato PDF.'}, status=400)
 
+            # Validar idade se for fornecida
+            if idade:
+                try:
+                    idade_int = int(idade)
+                    if idade_int < 16 or idade_int > 35:
+                        return JsonResponse({'error': 'Idade deve estar entre 16 e 35 anos.'}, status=400)
+                except ValueError:
+                    return JsonResponse({'error': 'Idade deve ser um número válido.'}, status=400)
+
+            # Validar instituição e curso
             try:
                 instituicao = Instituicao.objects.get(id=universidade_id, ativo=True)
                 curso = Curso.objects.get(id=curso_id, instituicao=instituicao, ativo=True)
             except (Instituicao.DoesNotExist, Curso.DoesNotExist):
                 return JsonResponse({'error': 'Universidade ou curso inválido.'}, status=400)
 
+            # VALIDAÇÃO IMPORTANTE: Verificar se a bolsa corresponde ao tipo de instituição
+            if bolsa_type == 'national' and instituicao.pais.nome != 'Angola':
+                return JsonResponse({'error': 'Para bolsa nacional, selecione uma universidade de Angola.'}, status=400)
+            
+            if bolsa_type == 'international' and instituicao.pais.nome == 'Angola':
+                return JsonResponse({'error': 'Para bolsa internacional, selecione uma universidade fora de Angola.'}, status=400)
+
+            # Gerar código temporário único
             temp_id = str(uuid.uuid4())[:8].upper()
+            
+            # Salvar arquivo temporário
             temp_file_path = os.path.join(settings.MEDIA_ROOT, 'temp_certificados', f'{temp_id}_{certificado.name}')
             os.makedirs(os.path.dirname(temp_file_path), exist_ok=True)
+            
             with open(temp_file_path, 'wb+') as temp_file:
                 for chunk in certificado.chunks():
                     temp_file.write(chunk)
 
+            # Criar candidatura - REMOVIDO O CAMPO tipo_bolsa
             candidatura = Candidatura(
                 codigo=temp_id,
                 nome_completo=nome_completo,
@@ -115,7 +141,9 @@ def apply(request):
             )
             candidatura.save()
 
+            # Salvar na sessão para referência futura
             request.session['temp_candidatura_id'] = temp_id
+            request.session['tipo_bolsa'] = bolsa_type
 
             return JsonResponse({
                 'success': True,
