@@ -26,9 +26,8 @@ SECRET_KEY = 'django-insecure-3^v&6p-ab1r^8o5+z7)u52hb%xq-92ua11z)pyzg!aovt9iixz
 DEBUG = False
 
 #ALLOWED_HOSTS = []
-#ALLOWED_HOSTS = ['*']
-ALLOWED_HOSTS = ['bolsas-emanuel-xirimbimbi.onrender.com/', 'localhost', '127.0.0.1']
-
+ALLOWED_HOSTS = ['*']
+#ALLOWED_HOSTS = ['bolsas-emanuel-xirimbimbi.onrender.com/', 'localhost', '127.0.0.1']
 
 # Application definition
 
