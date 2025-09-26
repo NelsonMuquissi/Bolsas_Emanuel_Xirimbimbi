@@ -3,7 +3,7 @@ from django.shortcuts import render, redirect
 from django.http import JsonResponse, HttpResponse
 from django.views.decorators.csrf import csrf_exempt
 from django.contrib import messages
-from .config import PRONTU_API_URL, PRONTU_TOKEN
+from .config1 import PRONTU_API_URL, PRONTU_TOKEN
 from datetime import datetime, timedelta
 from django.utils import timezone
 from candidaturas.models import Candidatura, Instituicao, Curso
