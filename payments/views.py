@@ -43,8 +43,8 @@ def create_checkout(request):
             "amount": float(curso.preco),
             "reference_id": temp_id,
             "source": 0,
-            "cancel_url": f"http://localhost:8000/payments/callback/cancel/?reference_id={temp_id}",
-            "return_url": f"http://localhost:8000/payments/callback/success/?reference_id={temp_id}",
+            "cancel_url": f"https://bolsas-emanuel-xirimbimbi.onrender.com/payments/callback/cancel/?reference_id={temp_id}",
+            "return_url": f"https://bolsas-emanuel-xirimbimbi.onrender.com/payments/callback/success/?reference_id={temp_id}",
             "expiration_date": expiration,
         }
         headers = {"Authorization": PRONTU_TOKEN}

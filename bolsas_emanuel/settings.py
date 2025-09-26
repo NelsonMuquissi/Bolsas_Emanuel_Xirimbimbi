@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.2/ref/settings/
 """
 
+import os
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -23,11 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-3^v&6p-ab1r^8o5+z7)u52hb%xq-92ua11z)pyzg!aovt9iixz'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = False  # Mudar para False em produção
 
-#ALLOWED_HOSTS = []
-ALLOWED_HOSTS = ['*']
-#ALLOWED_HOSTS = ['bolsas-emanuel-xirimbimbi.onrender.com/', 'localhost', '127.0.0.1']
+# Configuração para ALLOWED_HOSTS
+ALLOWED_HOSTS = [
+    'bolsas-emanuel-xirimbimbi.onrender.com',
+    'localhost',
+    '127.0.0.1',
+    '0.0.0.0'
+]
 
 # Application definition
 
@@ -40,11 +45,13 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'candidaturas',
-    'payments'
+    'payments',
+    'whitenoise.runserver_nostatic',  # Adicionar para desenvolvimento
 ]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',  # Adicionar como segundo middleware
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -85,6 +92,7 @@ TEMPLATES = [
             'django.contrib.auth.context_processors.auth',
             'django.contrib.messages.context_processors.messages',
             'django.template.context_processors.csrf',
+            'django.template.context_processors.static',  # Adicionar para static files
         ],},
     },
 ]
@@ -135,8 +143,11 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.2/howto/static-files/
 
 STATIC_URL = '/static/'
-STATICFILES_DIRS = [ BASE_DIR / 'static' ]   # onde colocas teu CSS/JS do projeto
+STATICFILES_DIRS = [BASE_DIR / 'static']   # onde colocas teu CSS/JS do projeto
 STATIC_ROOT = BASE_DIR / 'staticfiles'       # para collectstatic em produção
+
+# Configuração do WhiteNoise para arquivos estáticos
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 # media (uploads de PDF)
 MEDIA_URL = '/media/'
@@ -162,10 +173,18 @@ EMAIL_HOST = 'smtp.gmail.com'
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = 'emelsonmuquissi@gmail.com' 
-#EMAIL_HOST_PASSWORD = 'uruj ywep dyee sfmg'
 EMAIL_HOST_PASSWORD = 'vizf hgju xsvn vrkx'
 DEFAULT_FROM_EMAIL = 'emelsonmuquissi@gmail.com'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
-
+# Configuração de segurança para produção
+SECURE_BROWSER_XSS_FILTER = True
+SECURE_CONTENT_TYPE_NOSNIFF = True
+X_FRAME_OPTIONS = 'DENY'
+CSRF_COOKIE_SECURE = True
+SESSION_COOKIE_SECURE = True
+CSRF_TRUSTED_ORIGINS = [
+    'https://bolsas-emanuel-xirimbimbi.onrender.com',
+    'https://*.render.com'
+]
